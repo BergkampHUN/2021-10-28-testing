@@ -1,4 +1,4 @@
-import { debounceTime, first, Observable, of } from 'rxjs';
+import { debounceTime, first, interval, Observable, of, take } from 'rxjs';
 import { marbles } from 'rxjs-marbles/jest';
 import { filter, map } from 'rxjs/operators';
 
@@ -38,6 +38,18 @@ describe('RxJs', () => {
         map((number) => number / 2)
       );
       m.expect(destination$).toBeObservable('v', { z: 50333 });
+    })
+  );
+
+  it(
+    'should test an interval',
+    marbles((m) => {
+      const source$ = interval(100).pipe(take(3));
+      m.expect(source$).toBeObservable('100ms a 99ms b 99ms (c|)', {
+        a: 0,
+        b: 1,
+        c: 2
+      });
     })
   );
 });
