@@ -1,15 +1,17 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
 import { parseAddress } from './parse-address';
 
 export class AddressLookuper {
-  addresses: string[];
+  constructor(private httpClient: HttpClient) {}
 
-  constructor(addressesSupplier: () => string[]) {
-    this.addresses = addressesSupplier();
-  }
-
-  lookup(query: string): boolean {
+  lookup(query: string): Observable<boolean> {
     parseAddress(query);
-    return this.addresses.some((address) => address.startsWith(query));
+    return this.httpClient
+      .get<unknown[]>('https://nominatim.openstreetmap.org/search.php', {
+        params: new HttpParams().set('format', 'jsonv2').set('q', query)
+      })
+      .pipe(map((addresses) => addresses.length > 0));
   }
 
   // istanbul ignore next
